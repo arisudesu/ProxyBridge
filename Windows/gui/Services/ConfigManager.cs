@@ -52,7 +52,11 @@ internal static class AtomicFileHelper
                 Directory.CreateDirectory(directory);
             }
 
-            File.WriteAllText(tempPath, content);
+            using (var fs = new FileStream(tempPath, FileMode.Create, FileAccess.Write))
+            {
+                fs.Write(System.Text.Encoding.UTF8.GetBytes(content));
+                fs.Flush(flushToDisk: true);
+            }
             File.Move(tempPath, filePath, overwrite: true);
             return true;
         }
