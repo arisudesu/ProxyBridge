@@ -23,12 +23,20 @@ public class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.MainWindow = new MainWindow { DataContext = new MainWindowViewModel() };
+            var mainWindow = new MainWindow { DataContext = new MainWindowViewModel() };
+            desktop.MainWindow = mainWindow;
 
             if (StartMinimized)
             {
-                desktop.MainWindow.WindowState = WindowState.Minimized;
-                desktop.MainWindow.ShowInTaskbar = false;
+                mainWindow.ShowInTaskbar = false;
+                mainWindow.WindowState = WindowState.Minimized;
+                EventHandler? onOpened = null;
+                onOpened = (_, _) =>
+                {
+                    mainWindow.Opened -= onOpened;
+                    mainWindow.Hide();
+                };
+                mainWindow.Opened += onOpened;
             }
 
             try
